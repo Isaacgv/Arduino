@@ -32,12 +32,14 @@ void loop()
   buttonState = digitalRead(buttonPin);
   if (buttonState == HIGH) 
   {
-    irsend.sendNEC(KEY, 32)
-    delay(100);
-    state = 1;
+      Serial.println("[INF]Ask for code");
+      irsend.sendNEC(KEY, 32);
+      delay(40);
+      irrecv.enableIRIn();
+      state = 1;
   }
   
-  if (state == 1 && irrecv.decode(&results)) 
+  if (state==1 && irrecv.decode(&results)) 
   {
     Serial.println(results.value, HEX);
     irrecv.resume(); // Receive the next value
@@ -45,10 +47,12 @@ void loop()
     switch (results.value)
       {
         case CODE:
-         Serial.println("Code recive");
+         Serial.println("[CONF] CODE RECIVE");
          irsend.sendNEC(0xFFAAAA, 32);
-         Serial.println("Send OK confirmation");
+         Serial.println("[INF]Send OK confirmation");
          state = 0;
+         delay(40);
+         irrecv.enableIRIn();
          break;
       }
       irrecv.resume();
